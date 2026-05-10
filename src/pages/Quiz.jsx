@@ -54,13 +54,11 @@ function Quiz() {
     }
   };
 
-  // PERBAIKAN: Matching bisa di un-click
   const handleMatchingSelect = (questionId, idx, side) => {
     const currentPairs = answers[questionId] || {};
 
     if (side === "left") {
       if (currentPairs[idx] !== undefined) {
-        // Jika sudah dipasangkan, hapus pasangan tersebut (Un-pair)
         const newPairs = { ...currentPairs };
         delete newPairs[idx];
         setAnswers({ ...answers, [questionId]: newPairs });
@@ -69,25 +67,21 @@ function Quiz() {
           setMatchingSelection({ questionId: null, leftIdx: null });
         }
       } else {
-        // Jika belum, jadikan aktif untuk siap ditarik
         setMatchingSelection({ questionId, leftIdx: idx });
       }
     } else if (side === "right") {
-      // Cek apakah item kanan ini sudah dipasangkan dengan kiri yg lain
       let newPairs = { ...currentPairs };
       for (let leftKey in newPairs) {
         if (newPairs[leftKey] === idx) {
-          delete newPairs[leftKey]; // Lepaskan pasangan lama
+          delete newPairs[leftKey];
         }
       }
 
       if (matchingSelection.questionId === questionId && matchingSelection.leftIdx !== null) {
-        // Pasangkan dengan item kiri yang sedang aktif
         newPairs[matchingSelection.leftIdx] = idx;
         setAnswers({ ...answers, [questionId]: newPairs });
         setMatchingSelection({ questionId: null, leftIdx: null });
       } else {
-        // Jika hanya klik kanan (tanpa ada kiri yg aktif), update state (untuk un-pair)
         setAnswers({ ...answers, [questionId]: newPairs });
       }
     }
@@ -255,7 +249,6 @@ function Quiz() {
                         {displayImage && <img src={displayImage} alt="mood" className="mood-img" />}
                         <span className="mood-text">{displayText}</span>
                         
-                        {/* Lingkaran Hijau untuk Multi-Select */}
                         {type === "Multi-Select" && (
                           <div className={`multi-check ${isSelected ? "checked" : ""}`}></div>
                         )}
@@ -287,16 +280,24 @@ function Quiz() {
                 </div>
               )}
 
-              {/* 3. DRAG & DROP */}
+              {/* 3. DRAG & DROP (PERBAIKAN LOGIKA) */}
               {isDragDrop && q.options?.zones && (
                 <div className="quiz-dragdrop-container">
                   <div className="drag-items-pool">
-                    {q.options.items.map((item, iIdx) => !answers[q.id]?.[iIdx] && (
-                      <div key={iIdx} className="draggable-item" draggable onDragStart={() => handleDragStart(iIdx)} onClick={() => setDraggedItem(iIdx)}>
-                        {item.image && <img src={item.image} alt="" />}
-                        <span>{item.text}</span>
-                      </div>
-                    ))}
+                    {q.options.items.map((item, iIdx) => {
+                      // Logika ketat: Apakah item ini sudah ditaruh di kotak mana pun?
+                      const isPlaced = answers[q.id] !== undefined && answers[q.id][iIdx] !== undefined;
+                      
+                      // Jika sudah ditaruh, jangan tampilkan di atas
+                      if (isPlaced) return null;
+
+                      return (
+                        <div key={iIdx} className="draggable-item" draggable onDragStart={() => handleDragStart(iIdx)} onClick={() => setDraggedItem(iIdx)}>
+                          {item.image && <img src={item.image} alt="" />}
+                          <span>{item.text}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                   <div className="drop-zones-grid">
                     {q.options.zones.map((z, zIdx) => (
@@ -393,7 +394,7 @@ function Quiz() {
                     </div>
                   </div>
                   <div className="canvas-wrapper">
-                    <CanvasDraw key={`canvas-${q.id}`} ref={el => canvasRefs.current[q.id] = el} brushColor={brushColor} brushRadius={4} canvasWidth={window.innerWidth > 600 ? 550 : 300} canvasHeight={350} imgSrc={type === "Coloring Canvas" ? q.content : ""} />
+                    <CanvasDraw key={`canvas-${q.id}`} ref={el => canvasRefs.current[q.id] = el} brushColor={brushColor} brushRadius={4} canvasWidth={window.innerWidth > 600 ? 550 : 300} canvasHeight={350} imgSrc={type === "Coloring Canvas" ? q.content : ""} style={{ border: '2px solid #E0F2F1', borderRadius: '15px' }} />
                   </div>
                 </div>
               )}
