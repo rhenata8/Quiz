@@ -13,6 +13,10 @@ function BottomNav() {
         <span className="icon">📚</span>
         <span className="nav-text">Pelajaran</span>
       </NavLink>
+      <NavLink to="/assignments" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+        <span className="icon">📝</span>
+        <span className="nav-text">Tugas</span>
+      </NavLink>
       <NavLink to="/scores" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
         <span className="icon">📊</span>
         <span className="nav-text">Skor</span>

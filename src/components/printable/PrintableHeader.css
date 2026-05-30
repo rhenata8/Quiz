@@ -1,0 +1,97 @@
+.ph-root {
+  background: #fff;
+  border-bottom: 3px solid #2D6A76;
+  padding: 14px 16px 16px;
+  margin-bottom: 18px;
+  font-family: 'Nunito', system-ui, -apple-system, Segoe UI, sans-serif;
+  color: #1A3D45;
+}
+
+.ph-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.ph-logo {
+  height: 56px;
+  width: auto;
+  object-fit: contain;
+}
+
+.ph-title-block {
+  flex: 1;
+}
+
+.ph-school {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.ph-title {
+  font-size: 1.45rem;
+  margin: 2px 0 4px;
+  color: #1A3D45;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.ph-desc {
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 600;
+}
+
+.ph-key-badge {
+  display: inline-block;
+  margin-top: 6px;
+  background: #FB8C00;
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+.ph-fields {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1.4fr;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.ph-field {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.ph-field-label {
+  color: #2D6A76;
+  white-space: nowrap;
+}
+.ph-field-line {
+  flex: 1;
+  border-bottom: 1.5px solid #555;
+  height: 18px;
+}
+
+.ph-instructions {
+  background: #F1F5F7;
+  border-left: 4px solid #2D6A76;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.88rem;
+}
+.ph-instructions p {
+  margin: 4px 0 0;
+  line-height: 1.45;
+  font-weight: 600;
+  color: #333;
+}

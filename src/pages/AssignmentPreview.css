@@ -1,0 +1,151 @@
+.ap-wrapper {
+  font-family: 'Nunito', sans-serif;
+  background-color: #ECEFF1;
+  min-height: 100vh;
+  padding: 16px 16px 140px;
+  color: #333;
+}
+
+.alert-warning {
+  background: #FFF8E1;
+  border-left: 4px solid #FB8C00;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-weight: 700;
+  color: #6D4C00;
+  margin-bottom: 16px;
+}
+.muted { color: #888; font-style: italic; }
+
+.ap-actions {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: white;
+  border-radius: 14px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+.ap-actions-left, .ap-actions-right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ap-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  background: #F1F8FA;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #2D6A76;
+}
+.ap-toggle input { accent-color: #2D6A76; width: 18px; height: 18px; }
+
+.btn-secondary {
+  background: #ECEFF1;
+  color: #455A64;
+  border: none;
+  padding: 9px 14px;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.btn-secondary:hover { background: #CFD8DC; }
+
+.btn-primary {
+  background: white;
+  color: #2D6A76;
+  border: 2px solid #2D6A76;
+  padding: 9px 14px;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.btn-primary:hover { background: #F1F8FA; }
+.btn-primary.solid { background: #2D6A76; color: white; }
+.btn-primary.solid:hover { background: #1F4F58; }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ap-meta {
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+.ap-meta h2 {
+  margin: 0 0 4px;
+  color: #2D6A76;
+  font-weight: 800;
+}
+.ap-meta p {
+  margin: 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+/* ---------- Paper container ---------- */
+.ap-paper-container {
+  display: flex;
+  justify-content: center;
+}
+.ap-paper {
+  /* A4-ish width on screen. We use 800px so it reads well but render to
+     A4 size in the PDF capture pass. */
+  width: min(900px, 100%);
+  background: white;
+  padding: 28px 32px;
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  /* Make sure children don't shrink in odd ways during html2canvas. */
+  display: block;
+}
+
+.ap-no-questions {
+  text-align: center;
+  padding: 30px;
+  border: 2px dashed #CFD8DC;
+  border-radius: 12px;
+  color: #888;
+  font-weight: 700;
+}
+
+/* ---------- Print stylesheet ---------- */
+@media print {
+  /* Hide app chrome */
+  .admin-topbar,
+  .bottom-nav,
+  .no-print {
+    display: none !important;
+  }
+
+  body, .ap-wrapper {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .ap-paper-container {
+    display: block;
+  }
+  .ap-paper {
+    width: 100% !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 12mm !important;
+  }
+  .ap-meta { display: none; }
+
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+}

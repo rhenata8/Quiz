@@ -124,9 +124,18 @@ function Lessons() {
             <h2>Pustaka Pelajaran</h2>
             <p>Jelajahi kategori dan temukan materi pembelajaran yang menyenangkan.</p>
           </div>
-          <button className="btn-add-lesson" onClick={openModalForAdd}>
-            <span className="icon-plus">✨</span> Tambah Bab Baru
-          </button>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <Link
+              to="/assignments"
+              className="btn-add-lesson"
+              style={{ background: 'white', color: '#356D7A', border: '2px solid #356D7A', textDecoration: 'none' }}
+            >
+              <span className="icon-plus">📝</span> Buat Tugas PDF
+            </Link>
+            <button className="btn-add-lesson" onClick={openModalForAdd}>
+              <span className="icon-plus">✨</span> Tambah Bab Baru
+            </button>
+          </div>
         </div>
       </header>
 
