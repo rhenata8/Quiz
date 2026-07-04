@@ -13,6 +13,7 @@ import Quiz from './pages/Quiz';
 import Assignments from './pages/Assignments';
 import AssignmentBuilder from './pages/AssignmentBuilder';
 import AssignmentPreview from './pages/AssignmentPreview';
+import ScoreRecap from './pages/ScoreRecap';
 import './App.css';
 
 function App() {
@@ -37,6 +38,9 @@ function App() {
             <Route path="/assignments/new" element={<ProtectedRoute><AssignmentBuilder /></ProtectedRoute>} />
             <Route path="/assignments/:id/edit" element={<ProtectedRoute><AssignmentBuilder /></ProtectedRoute>} />
             <Route path="/assignments/:id/preview" element={<ProtectedRoute><AssignmentPreview /></ProtectedRoute>} />
+
+            {/* Rekap Nilai Pretest/Posttest */}
+            <Route path="/score-recap" element={<ProtectedRoute><ScoreRecap /></ProtectedRoute>} />
           </Routes>
         </main>
         <BottomNav />

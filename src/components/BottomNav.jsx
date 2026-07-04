@@ -17,9 +17,9 @@ function BottomNav() {
         <span className="icon">📝</span>
         <span className="nav-text">Tugas</span>
       </NavLink>
-      <NavLink to="/scores" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+      <NavLink to="/score-recap" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
         <span className="icon">📊</span>
-        <span className="nav-text">Skor</span>
+        <span className="nav-text">Rekap</span>
       </NavLink>
     </nav>
   );

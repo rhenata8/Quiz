@@ -1,0 +1,230 @@
+/* ─── PrintableScoreRecap.css ──────────────────────────────────────────── */
+/* Hanya aktif saat print, disembunyikan di layar normal */
+
+.psr-wrapper {
+  display: none;
+}
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+
+  .psr-wrapper {
+    display: block;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 11px;
+    color: #1e293b;
+    padding: 1.5cm 1.5cm 1cm;
+    max-width: 100%;
+  }
+
+  /* ── Header ─────────────────────────────────────────────────────────── */
+  .psr-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #6366f1;
+  }
+
+  .psr-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .psr-logo-icon {
+    font-size: 1.8rem;
+  }
+
+  .psr-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #6366f1;
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  .psr-subtitle {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin: 0.1rem 0 0;
+  }
+
+  .psr-meta {
+    text-align: right;
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+
+  .psr-meta-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  .psr-meta-row span:first-child {
+    color: #94a3b8;
+  }
+
+  .psr-meta-row span:last-child {
+    font-weight: 600;
+    color: #334155;
+  }
+
+  /* ── Summary ─────────────────────────────────────────────────────────── */
+  .psr-summary {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .psr-summary-box {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .psr-summary-box.pretest {
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+  }
+
+  .psr-summary-box.posttest {
+    background: #dcfce7;
+    border: 1px solid #bbf7d0;
+  }
+
+  .psr-summary-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #475569;
+  }
+
+  .psr-summary-count {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .psr-summary-avg {
+    font-size: 0.78rem;
+    color: #475569;
+  }
+
+  .psr-summary-date {
+    font-size: 0.72rem;
+    color: #64748b;
+  }
+
+  /* ── Section ─────────────────────────────────────────────────────────── */
+  .psr-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .psr-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px 6px 0 0;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .psr-section-header.pretest {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .psr-section-header.posttest {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  /* ── Table ───────────────────────────────────────────────────────────── */
+  .psr-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+  }
+
+  .psr-table thead tr {
+    background: #f8fafc;
+  }
+
+  .psr-table th {
+    padding: 0.4rem 0.6rem;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+  }
+
+  .psr-table td {
+    padding: 0.35rem 0.6rem;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+  }
+
+  .psr-table tr.even td {
+    background: #ffffff;
+  }
+
+  .psr-table tr.odd td {
+    background: #f8fafc;
+  }
+
+  .psr-th-num,
+  .psr-td-num {
+    width: 30px;
+    text-align: center;
+    color: #94a3b8;
+  }
+
+  .psr-th-score,
+  .psr-td-score {
+    width: 50px;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .psr-tr-avg td {
+    background: #eef2ff !important;
+    font-weight: 700;
+    color: #4338ca;
+  }
+
+  /* ── Page break ─────────────────────────────────────────────────────── */
+  .psr-page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  /* ── Footer ──────────────────────────────────────────────────────────── */
+  .psr-footer {
+    margin-top: 1.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e2e8f0;
+    font-size: 0.7rem;
+    color: #94a3b8;
+    text-align: center;
+  }
+}
