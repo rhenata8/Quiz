@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import PrintableScoreRecap from '../components/printable/PrintableScoreRecap';
+import CustomSelect from '../components/CustomSelect';
 import {
-  generateBulkScores,
   DEFAULT_PRETEST_DATE,
   DEFAULT_POSTTEST_DATE,
   formatDateID,
@@ -147,7 +147,7 @@ const STUDENT_LIST = [
 ];
 
 
-const TABS = ['riwayat', 'input', 'generator'];
+const TABS = ['riwayat', 'input'];
 
 function ScoreRecap() {
   const [activeTab, setActiveTab] = useState('riwayat');
@@ -170,28 +170,11 @@ function ScoreRecap() {
   const [formLoading, setFormLoading] = useState(false);
   const [formMsg, setFormMsg] = useState(null);
 
-  // ─── Generator ────────────────────────────────────────────────────────────
-  const [genType, setGenType] = useState('pretest');
-  const [genDate, setGenDate] = useState(DEFAULT_PRETEST_DATE);
-  const [genStudents, setGenStudents] = useState(
-    STUDENT_LIST.map((s) => ({ ...s, selected: true }))
-  );
-  const [genPreview, setGenPreview] = useState([]);
-  const [genLoading, setGenLoading] = useState(false);
-  const [genMsg, setGenMsg] = useState(null);
-  const [rawStudentInput, setRawStudentInput] = useState('');
-  const [showPasteArea, setShowPasteArea] = useState(false);
-
   useEffect(() => {
     fetchScores();
   }, []);
 
-  // Update tanggal default saat genType berubah
-  useEffect(() => {
-    setGenDate(
-      genType === 'pretest' ? DEFAULT_PRETEST_DATE : DEFAULT_POSTTEST_DATE
-    );
-  }, [genType]);
+
 
   // ─── Fetch dari Supabase ───────────────────────────────────────────────────
   async function fetchScores() {
@@ -258,69 +241,7 @@ function ScoreRecap() {
     }
   }
 
-  // ─── Generate Preview ──────────────────────────────────────────────────────
-  function handleGenerate() {
-    const selected = genStudents.filter((s) => s.selected);
-    if (selected.length === 0) {
-      setGenMsg({ type: 'error', text: 'Pilih minimal 1 siswa.' });
-      return;
-    }
-    const preview = generateBulkScores(selected, genType, genDate);
-    setGenPreview(preview);
-    setGenMsg(null);
-  }
 
-  // ─── Simpan hasil generator ke Supabase ───────────────────────────────────
-  async function handleSaveGenerated() {
-    if (genPreview.length === 0) return;
-    setGenLoading(true);
-    setGenMsg(null);
-    try {
-      const { error } = await supabase.from('score_recap').insert(genPreview);
-      if (error) throw error;
-      setGenMsg({
-        type: 'success',
-        text: `${genPreview.length} nilai berhasil disimpan!`,
-      });
-      setGenPreview([]);
-      fetchScores();
-    } catch (err) {
-      setGenMsg({ type: 'error', text: err.message });
-    } finally {
-      setGenLoading(false);
-    }
-  }
-
-  // ─── Parse input teks daftar siswa ────────────────────────────────────────
-  function handleParseStudents() {
-    const lines = rawStudentInput
-      .split('\n')
-      .map((l) => l.trim())
-      .filter(Boolean);
-    const parsed = lines.map((line) => {
-      // Format: "Nama Siswa | Nama Sekolah" atau "Nama Siswa,Nama Sekolah"
-      const parts = line.split(/[|,\t]/).map((p) => p.trim());
-      return {
-        name: parts[0] || line,
-        school: parts[1] || 'TK Tidak Diketahui',
-        selected: true,
-      };
-    });
-    setGenStudents(parsed);
-    setShowPasteArea(false);
-    setRawStudentInput('');
-  }
-
-  // ─── Toggle pilih siswa di generator ──────────────────────────────────────
-  function toggleStudent(idx) {
-    setGenStudents((prev) =>
-      prev.map((s, i) => (i === idx ? { ...s, selected: !s.selected } : s))
-    );
-  }
-
-  function toggleAllStudents(val) {
-    setGenStudents((prev) => prev.map((s) => ({ ...s, selected: val })));
-  }
 
   // ─── Print PDF ─────────────────────────────────────────────────────────────
   function handlePrint() {
@@ -395,12 +316,6 @@ function ScoreRecap() {
         >
           ✏️ Input Manual
         </button>
-        <button
-          className={`sr-tab ${activeTab === 'generator' ? 'active' : ''}`}
-          onClick={() => setActiveTab('generator')}
-        >
-          ⚡ Generator
-        </button>
       </div>
 
       {/* ── TAB RIWAYAT ─────────────────────────────────────────────────────── */}
@@ -415,26 +330,27 @@ function ScoreRecap() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <select
-              className="sr-select"
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-            >
-              <option value="semua">Semua Tes</option>
-              <option value="pretest">Pretest</option>
-              <option value="posttest">Posttest</option>
-            </select>
-            <select
-              className="sr-select"
-              value={filterSchool}
-              onChange={(e) => setFilterSchool(e.target.value)}
-            >
-              {schools.map((s) => (
-                <option key={s} value={s}>
-                  {s === 'semua' ? 'Semua Sekolah' : s}
-                </option>
-              ))}
-            </select>
+            <div style={{ width: '160px' }}>
+              <CustomSelect
+                value={filterType}
+                onChange={(val) => setFilterType(val)}
+                options={[
+                  { value: 'semua', label: 'Semua Tes' },
+                  { value: 'pretest', label: 'Pretest' },
+                  { value: 'posttest', label: 'Posttest' }
+                ]}
+              />
+            </div>
+            <div style={{ width: '180px' }}>
+              <CustomSelect
+                value={filterSchool}
+                onChange={(val) => setFilterSchool(val)}
+                options={schools.map((s) => ({
+                  value: s,
+                  label: s === 'semua' ? 'Semua Sekolah' : s
+                }))}
+              />
+            </div>
             <button className="sr-btn-print" onClick={handlePrint}>
               🖨️ Print PDF
             </button>
@@ -452,7 +368,7 @@ function ScoreRecap() {
             ) : filteredScores.length === 0 ? (
               <div className="sr-empty">
                 <span>📭</span>
-                <p>Belum ada data nilai. Gunakan tab Generator atau Input Manual.</p>
+                <p>Belum ada data nilai. Gunakan tab Input Manual.</p>
               </div>
             ) : (
               <table className="sr-table">
@@ -540,27 +456,29 @@ function ScoreRecap() {
             <div className="sr-form-row">
               <div className="sr-field">
                 <label>Jenis Tes</label>
-                <select
+                <CustomSelect
                   value={form.test_type}
-                  onChange={(e) =>
+                  onChange={(val) =>
                     setForm({
                       ...form,
-                      test_type: e.target.value,
+                      test_type: val,
                       test_date:
-                        e.target.value === 'pretest'
+                        val === 'pretest'
                           ? DEFAULT_PRETEST_DATE
                           : DEFAULT_POSTTEST_DATE,
                     })
                   }
-                >
-                  <option value="pretest">Pretest</option>
-                  <option value="posttest">Posttest</option>
-                </select>
+                  options={[
+                    { value: 'pretest', label: 'Pretest' },
+                    { value: 'posttest', label: 'Posttest' }
+                  ]}
+                />
               </div>
               <div className="sr-field">
                 <label>Tanggal</label>
                 <input
                   type="date"
+                  className="sr-date-input"
                   value={form.test_date}
                   onChange={(e) => setForm({ ...form, test_date: e.target.value })}
                 />
@@ -591,199 +509,7 @@ function ScoreRecap() {
         </div>
       )}
 
-      {/* ── TAB GENERATOR ───────────────────────────────────────────────────── */}
-      {activeTab === 'generator' && (
-        <div className="sr-content">
-          <h3 className="sr-section-title">⚡ Generator Nilai Otomatis</h3>
-          <p className="sr-section-sub">
-            Generate nilai random untuk seluruh siswa sekaligus.
-            <br />
-            <b>Pretest:</b> 20–40 &nbsp;|&nbsp; <b>Posttest:</b> 80–97
-          </p>
 
-          {/* Pengaturan generator */}
-          <div className="sr-gen-settings">
-            <div className="sr-field">
-              <label>Jenis Tes</label>
-              <div className="sr-radio-group">
-                <label className={`sr-radio ${genType === 'pretest' ? 'active' : ''}`}>
-                  <input
-                    type="radio"
-                    name="genType"
-                    value="pretest"
-                    checked={genType === 'pretest'}
-                    onChange={() => setGenType('pretest')}
-                  />
-                  Pretest (20–40)
-                </label>
-                <label className={`sr-radio ${genType === 'posttest' ? 'active' : ''}`}>
-                  <input
-                    type="radio"
-                    name="genType"
-                    value="posttest"
-                    checked={genType === 'posttest'}
-                    onChange={() => setGenType('posttest')}
-                  />
-                  Posttest (80–97)
-                </label>
-              </div>
-            </div>
-            <div className="sr-field">
-              <label>Tanggal</label>
-              <input
-                type="date"
-                value={genDate}
-                onChange={(e) => setGenDate(e.target.value)}
-                className="sr-date-input"
-              />
-              <span className="sr-date-hint">
-                {genType === 'pretest'
-                  ? '(Default: 18 Mei 2026)'
-                  : '(Default: 22 Juni 2026)'}
-              </span>
-            </div>
-          </div>
-
-          {/* Daftar siswa */}
-          <div className="sr-gen-students">
-            <div className="sr-gen-students-header">
-              <span>
-                Daftar Siswa ({genStudents.filter((s) => s.selected).length} dipilih)
-              </span>
-              <div className="sr-gen-actions">
-                <button
-                  className="sr-btn-sm"
-                  onClick={() => toggleAllStudents(true)}
-                >
-                  Pilih Semua
-                </button>
-                <button
-                  className="sr-btn-sm"
-                  onClick={() => toggleAllStudents(false)}
-                >
-                  Hapus Pilihan
-                </button>
-                <button
-                  className="sr-btn-sm accent"
-                  onClick={() => setShowPasteArea(!showPasteArea)}
-                >
-                  📋 Input Daftar Siswa
-                </button>
-              </div>
-            </div>
-
-            {showPasteArea && (
-              <div className="sr-paste-area">
-                <p className="sr-paste-hint">
-                  Tempel daftar siswa, satu baris per siswa.<br />
-                  Format: <code>Nama Siswa | Nama Sekolah</code> atau pisahkan dengan koma/tab.
-                </p>
-                <textarea
-                  rows={8}
-                  placeholder={'Aisyah Putri | TK Melati\nBudi Santoso | TK Harapan\n...'}
-                  value={rawStudentInput}
-                  onChange={(e) => setRawStudentInput(e.target.value)}
-                />
-                <button className="sr-btn-primary" onClick={handleParseStudents}>
-                  ✅ Proses Daftar
-                </button>
-              </div>
-            )}
-
-            <div className="sr-student-list">
-              {genStudents.map((s, idx) => (
-                <label key={idx} className="sr-student-item">
-                  <input
-                    type="checkbox"
-                    checked={s.selected}
-                    onChange={() => toggleStudent(idx)}
-                  />
-                  <span className="sr-student-name">{s.name}</span>
-                  <span className="sr-student-school">{s.school}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <button className="sr-btn-generate" onClick={handleGenerate}>
-            ⚡ Generate Nilai
-          </button>
-
-          {/* Preview hasil generate */}
-          {genPreview.length > 0 && (
-            <div className="sr-gen-preview">
-              <div className="sr-gen-preview-header">
-                <h4>Preview ({genPreview.length} siswa)</h4>
-                <div>
-                  <span className="sr-preview-range">
-                    {genType === 'pretest'
-                      ? 'Nilai: 20–40'
-                      : 'Nilai: 80–97'}{' '}
-                    | Tanggal: {formatDateID(genDate)}
-                  </span>
-                </div>
-              </div>
-              <div className="sr-table-wrap">
-                <table className="sr-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Nama Siswa</th>
-                      <th>Sekolah</th>
-                      <th>Nilai</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {genPreview.map((item, idx) => (
-                      <tr key={idx}>
-                        <td className="sr-td-num">{idx + 1}</td>
-                        <td className="sr-td-name">{item.student_name}</td>
-                        <td className="sr-td-school">{item.school_name}</td>
-                        <td>
-                          <span
-                            className="sr-score"
-                            style={{
-                              background:
-                                getScoreColor(item.score, item.test_type) + '22',
-                              color: getScoreColor(item.score, item.test_type),
-                            }}
-                          >
-                            {item.score}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              {genMsg && (
-                <div className={`sr-msg ${genMsg.type}`}>{genMsg.text}</div>
-              )}
-              <div className="sr-gen-save-row">
-                <button
-                  className="sr-btn-primary"
-                  onClick={handleSaveGenerated}
-                  disabled={genLoading}
-                >
-                  {genLoading
-                    ? 'Menyimpan...'
-                    : `💾 Simpan ${genPreview.length} Nilai ke Database`}
-                </button>
-                <button
-                  className="sr-btn-secondary"
-                  onClick={() => setGenPreview([])}
-                >
-                  Batal
-                </button>
-              </div>
-            </div>
-          )}
-
-          {genMsg && genPreview.length === 0 && (
-            <div className={`sr-msg ${genMsg.type}`}>{genMsg.text}</div>
-          )}
-        </div>
-      )}
     </div>
   );
 }

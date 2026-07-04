@@ -33,7 +33,7 @@ function PrintableScoreRecap({ scores, filterType, filterSchool }) {
       {/* Header */}
       <div className="psr-header">
         <div className="psr-logo">
-          <span className="psr-logo-icon">🌟</span>
+          <img src="/LogoFull-SiKecilPintar.png" alt="SiKecilPintar" className="psr-logo-image" />
           <div>
             <h1 className="psr-title">SiKecilPintar</h1>
             <p className="psr-subtitle">Laporan Rekap Nilai Siswa</p>

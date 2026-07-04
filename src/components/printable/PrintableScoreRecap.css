@@ -228,3 +228,9 @@
     text-align: center;
   }
 }
+
+.psr-logo-image {
+  height: 50px;
+  object-fit: contain;
+  margin-right: 15px;
+}

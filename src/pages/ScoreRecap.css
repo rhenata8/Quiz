@@ -1,10 +1,15 @@
 /* ─── ScoreRecap.css ─────────────────────────────────────────────────────── */
 
 .sr-wrapper {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.25rem 1rem 6rem;
-  font-family: 'Segoe UI', sans-serif;
+  max-width: 100%;
+  padding: 1.25rem 20px 6rem;
+  font-family: 'Nunito', sans-serif;
+}
+
+@media (min-width: 768px) {
+  .sr-wrapper {
+    padding: 20px 40px 120px 40px;
+  }
 }
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
@@ -17,15 +22,15 @@
 }
 
 .sr-header-text h2 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 0.2rem;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #2D6A76;
+  margin: 0 0 5px;
 }
 
 .sr-header-text p {
-  font-size: 0.85rem;
-  color: #64748b;
+  font-size: 0.95rem;
+  color: #666;
   margin: 0;
 }
 
@@ -48,7 +53,7 @@
 .sr-stat-num {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #6366f1;
+  color: #356D7A;
   line-height: 1;
 }
 
@@ -90,17 +95,14 @@
 
 .sr-tab.active {
   background: #fff;
-  color: #6366f1;
+  color: #356D7A;
   font-weight: 700;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* ── Content wrapper ─────────────────────────────────────────────────────── */
 .sr-content {
-  background: #fff;
-  border-radius: 14px;
-  border: 1px solid #e2e8f0;
-  padding: 1.25rem;
+  /* Removed white bg, so it matches Scores page structure */
 }
 
 /* ── Filter bar ─────────────────────────────────────────────────────────── */
@@ -108,75 +110,79 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
-  margin-bottom: 1rem;
   align-items: center;
+  background: white;
+  padding: 12px 20px;
+  border-radius: 15px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
 }
 
 .sr-search {
   flex: 1;
   min-width: 160px;
-  padding: 0.55rem 0.9rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 0.85rem;
+  padding: 8px 10px;
+  border: none;
+  font-size: 1rem;
   outline: none;
-  background: #f8fafc;
-  transition: border 0.2s;
+  background: transparent;
 }
 
 .sr-search:focus {
-  border-color: #6366f1;
-  background: #fff;
+  /* no shadow needed */
 }
 
 .sr-select {
-  padding: 0.55rem 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  background: #f8fafc;
-  color: #334155;
+  padding: 8px 10px;
+  border: none;
+  font-size: 1rem;
+  background: transparent;
+  color: #333;
   outline: none;
   cursor: pointer;
 }
 
 .sr-btn-print {
-  padding: 0.55rem 1rem;
-  background: #6366f1;
+  padding: 12px 20px;
+  background: #356D7A;
   color: #fff;
   border: none;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 800;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.2s;
 }
 
 .sr-btn-print:hover {
-  background: #4f46e5;
+  background: #2D6A76;
+  transform: translateY(-2px);
 }
 
 .sr-btn-danger {
-  padding: 0.55rem 0.9rem;
-  background: #fee2e2;
-  color: #dc2626;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  padding: 12px 20px;
+  background: #FFEBEE;
+  color: #C62828;
+  border: 1px solid #FFCDD2;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 800;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.2s;
 }
 
 .sr-btn-danger:hover {
-  background: #fca5a5;
+  background: #FFCDD2;
+  transform: translateY(-2px);
 }
 
 /* ── Table ──────────────────────────────────────────────────────────────── */
 .sr-table-wrap {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
   overflow-x: auto;
-  border-radius: 10px;
-  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
 
 .sr-table {
@@ -186,25 +192,25 @@
 }
 
 .sr-table thead tr {
-  background: #f8fafc;
+  /* no background needed */
 }
 
 .sr-table th {
-  padding: 0.75rem 1rem;
+  padding: 15px;
   text-align: left;
-  font-weight: 600;
-  color: #475569;
-  font-size: 0.8rem;
+  font-weight: 700;
+  color: #888;
+  font-size: 0.9rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 2px solid #F0F0F0;
   white-space: nowrap;
 }
 
 .sr-table td {
-  padding: 0.65rem 1rem;
-  border-bottom: 1px solid #f1f5f9;
-  color: #334155;
+  padding: 20px 15px;
+  border-bottom: 1px solid #F9F9F9;
+  vertical-align: middle;
+  color: #333;
 }
 
 .sr-table tbody tr:hover {
@@ -222,13 +228,13 @@
 }
 
 .sr-td-name {
-  font-weight: 600;
-  color: #1e293b !important;
+  font-weight: 700;
+  color: #333 !important;
 }
 
 .sr-td-school {
-  color: #64748b !important;
-  font-size: 0.82rem !important;
+  color: #666 !important;
+  font-size: 0.85rem !important;
 }
 
 .sr-badge {
@@ -281,7 +287,11 @@
 
 /* ── Form ────────────────────────────────────────────────────────────────── */
 .sr-form-wrap {
-  max-width: 700px;
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  max-width: 100%;
 }
 
 .sr-section-title {
@@ -339,7 +349,7 @@
 .sr-field input:focus,
 .sr-field select:focus,
 .sr-field textarea:focus {
-  border-color: #6366f1;
+  border-color: #356D7A;
   background: #fff;
 }
 
@@ -362,7 +372,7 @@
 
 .sr-btn-primary {
   padding: 0.75rem 1.5rem;
-  background: #6366f1;
+  background: #356D7A;
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -374,7 +384,7 @@
 }
 
 .sr-btn-primary:hover:not(:disabled) {
-  background: #4f46e5;
+  background: #2D6A76;
 }
 
 .sr-btn-primary:disabled {
@@ -437,9 +447,9 @@
 }
 
 .sr-radio.active {
-  border-color: #6366f1;
-  color: #6366f1;
-  background: #eef2ff;
+  border-color: #356D7A;
+  color: #356D7A;
+  background: #F4FAFA;
   font-weight: 700;
 }
 
@@ -502,9 +512,9 @@
 }
 
 .sr-btn-sm.accent {
-  background: #eef2ff;
-  color: #6366f1;
-  border-color: #c7d2fe;
+  background: #F4FAFA;
+  color: #356D7A;
+  border-color: #C4E1E6;
 }
 
 .sr-btn-sm.accent:hover {
@@ -564,7 +574,7 @@
 .sr-student-item input[type='checkbox'] {
   width: 15px;
   height: 15px;
-  accent-color: #6366f1;
+  accent-color: #356D7A;
   flex-shrink: 0;
 }
 
@@ -582,7 +592,7 @@
 .sr-btn-generate {
   width: 100%;
   padding: 0.85rem;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, #356D7A, #8b5cf6);
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -604,7 +614,7 @@
 
 /* ── Preview ─────────────────────────────────────────────────────────────── */
 .sr-gen-preview {
-  border: 2px solid #c7d2fe;
+  border: 2px solid #C4E1E6;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -614,8 +624,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1rem;
-  background: #eef2ff;
-  border-bottom: 1px solid #c7d2fe;
+  background: #F4FAFA;
+  border-bottom: 1px solid #C4E1E6;
 }
 
 .sr-gen-preview-header h4 {
@@ -626,7 +636,7 @@
 
 .sr-preview-range {
   font-size: 0.78rem;
-  color: #6366f1;
+  color: #356D7A;
   font-weight: 600;
 }
 
@@ -643,4 +653,33 @@
   .sr-wrapper {
     display: none;
   }
+}
+
+
+/* --- Kustomisasi Kalender --- */
+.sr-date-input {
+  background-color: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #374151;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sr-date-input:focus {
+  outline: none;
+  border-color: #356D7A;
+  box-shadow: 0 0 0 3px rgba(53, 109, 122, 0.1);
+}
+
+.sr-date-input::-webkit-calendar-picker-indicator {
+  background-color: #e5e7eb;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
 }
