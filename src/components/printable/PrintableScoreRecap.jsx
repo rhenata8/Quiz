@@ -6,7 +6,7 @@ import './PrintableScoreRecap.css';
  * PrintableScoreRecap
  * Komponen yang muncul saat tombol Print PDF diklik.
  * Dioptimalkan untuk tampilan cetak A4.
- * Mendukung filter aspek: ekoliterasi / food_literacy
+ * Data dibagi per Aspek (Ekoliterasi & Food Literacy) dan per Jenis Tes (Pretest & Posttest).
  */
 function PrintableScoreRecap({ scores, filterType, filterAspect, filterSchool }) {
   const printDate = new Date().toLocaleDateString('id-ID', {
@@ -21,34 +21,35 @@ function PrintableScoreRecap({ scores, filterType, filterAspect, filterSchool })
     return aspect || '-';
   }
 
-  // Rata-rata nilai
   function avg(data) {
     if (data.length === 0) return '0';
     return (data.reduce((a, b) => a + Number(b.score), 0) / data.length).toFixed(1);
   }
 
-  // Pisahkan data berdasarkan test_type
-  const pretestData  = scores.filter((s) => s.test_type === 'pretest');
-  const posttestData = scores.filter((s) => s.test_type === 'posttest');
+  // Kelompokkan data berdasarkan aspek dan jenis tes
+  const ekolPre  = scores.filter((s) => s.aspect === 'ekoliterasi'   && s.test_type === 'pretest');
+  const ekolPost = scores.filter((s) => s.aspect === 'ekoliterasi'   && s.test_type === 'posttest');
+  const foodPre  = scores.filter((s) => s.aspect === 'food_literacy' && s.test_type === 'pretest');
+  const foodPost = scores.filter((s) => s.aspect === 'food_literacy' && s.test_type === 'posttest');
 
-  const showBoth     = filterType === 'semua';
-  const showPretest  = filterType === 'pretest'  || showBoth;
-  const showPosttest = filterType === 'posttest' || showBoth;
+  // Tentukan apa yang ditampilkan berdasarkan filter
+  const showEkol = filterAspect === 'semua' || filterAspect === 'ekoliterasi';
+  const showFood = filterAspect === 'semua' || filterAspect === 'food_literacy';
+  const showPre  = filterType   === 'semua' || filterType   === 'pretest';
+  const showPost = filterType   === 'semua' || filterType   === 'posttest';
 
   // Judul aspek untuk header
   const aspectTitle = filterAspect === 'semua'
     ? 'Ekoliterasi & Food Literacy'
     : aspectLabel(filterAspect);
 
-  // Tampilkan kolom Aspek jika filter menampilkan semua aspek
-  const showAspectCol = filterAspect === 'semua';
-
-  function renderTable(data, label, colorClass) {
+  // ─── Render satu tabel ────────────────────────────────────────────────────
+  function renderTable(data, testLabel, aspectName, colorClass) {
     if (data.length === 0) return null;
     return (
       <div className="psr-section">
         <div className={`psr-section-header ${colorClass}`}>
-          <span>📋 DATA {label.toUpperCase()}</span>
+          <span>📋 {testLabel.toUpperCase()} — {aspectName.toUpperCase()}</span>
           <span>Tanggal: {formatDateID(data[0]?.test_date)}</span>
         </div>
         <table className="psr-table">
@@ -57,7 +58,6 @@ function PrintableScoreRecap({ scores, filterType, filterAspect, filterSchool })
               <th className="psr-th-num">No.</th>
               <th>Nama Siswa</th>
               <th>Asal Sekolah</th>
-              {showAspectCol && <th>Aspek</th>}
               <th className="psr-th-score">Nilai</th>
             </tr>
           </thead>
@@ -67,18 +67,35 @@ function PrintableScoreRecap({ scores, filterType, filterAspect, filterSchool })
                 <td className="psr-td-num">{idx + 1}</td>
                 <td>{item.student_name}</td>
                 <td>{item.school_name}</td>
-                {showAspectCol && <td>{aspectLabel(item.aspect)}</td>}
                 <td className="psr-td-score">{item.score}</td>
               </tr>
             ))}
             <tr className="psr-tr-avg">
-              <td colSpan={showAspectCol ? 4 : 3} style={{ textAlign: 'right', fontWeight: 700 }}>
-                Rata-rata Nilai {label}:
+              <td colSpan={3} style={{ textAlign: 'right', fontWeight: 700 }}>
+                Rata-rata:
               </td>
               <td className="psr-td-score">{avg(data)}</td>
             </tr>
           </tbody>
         </table>
+      </div>
+    );
+  }
+
+  // ─── Render ringkasan per aspek ───────────────────────────────────────────
+  function renderSummaryAspect(label, preData, postData) {
+    return (
+      <div className="psr-summary-box" style={{ flex: 1 }}>
+        <span className="psr-summary-label">{label.toUpperCase()}</span>
+        {showPre && (
+          <span className="psr-summary-avg">Pretest avg: {avg(preData)}</span>
+        )}
+        {showPost && (
+          <span className="psr-summary-avg">Posttest avg: {avg(postData)}</span>
+        )}
+        <span className="psr-summary-count">
+          {preData.length + postData.length} data
+        </span>
       </div>
     );
   }
@@ -117,41 +134,29 @@ function PrintableScoreRecap({ scores, filterType, filterAspect, filterSchool })
       </div>
 
       {/* Ringkasan */}
-      {showBoth && (
-        <div className="psr-summary">
-          <div className="psr-summary-box pretest">
-            <span className="psr-summary-label">PRETEST</span>
-            <span className="psr-summary-count">{pretestData.length} data</span>
-            <span className="psr-summary-avg">Rata-rata: {avg(pretestData)}</span>
-            {pretestData[0] && (
-              <span className="psr-summary-date">
-                {formatDateID(pretestData[0].test_date)}
-              </span>
-            )}
-          </div>
-          <div className="psr-summary-box posttest">
-            <span className="psr-summary-label">POSTTEST</span>
-            <span className="psr-summary-count">{posttestData.length} data</span>
-            <span className="psr-summary-avg">Rata-rata: {avg(posttestData)}</span>
-            {posttestData[0] && (
-              <span className="psr-summary-date">
-                {formatDateID(posttestData[0].test_date)}
-              </span>
-            )}
-          </div>
-        </div>
+      <div className="psr-summary">
+        {showEkol && renderSummaryAspect('Ekoliterasi', ekolPre, ekolPost)}
+        {showFood && renderSummaryAspect('Food Literacy', foodPre, foodPost)}
+      </div>
+
+      {/* ─── BAGIAN EKOLITERASI ──────────────────────────────────────────── */}
+      {showEkol && (
+        <>
+          {showPre  && renderTable(ekolPre,  'Pretest',  'Ekoliterasi', 'pretest')}
+          {showPost && renderTable(ekolPost, 'Posttest', 'Ekoliterasi', 'posttest')}
+        </>
       )}
 
-      {/* Tabel Pretest */}
-      {showPretest && renderTable(pretestData, 'Pretest', 'pretest')}
+      {/* Page break antara Ekoliterasi dan Food Literacy */}
+      {showEkol && showFood && <div className="psr-page-break" />}
 
-      {/* Page break jika dua tabel */}
-      {showBoth && pretestData.length > 0 && posttestData.length > 0 && (
-        <div className="psr-page-break" />
+      {/* ─── BAGIAN FOOD LITERACY ────────────────────────────────────────── */}
+      {showFood && (
+        <>
+          {showPre  && renderTable(foodPre,  'Pretest',  'Food Literacy', 'pretest')}
+          {showPost && renderTable(foodPost, 'Posttest', 'Food Literacy', 'posttest')}
+        </>
       )}
-
-      {/* Tabel Posttest */}
-      {showPosttest && renderTable(posttestData, 'Posttest', 'posttest')}
 
       <div className="psr-footer">
         Dokumen ini digenerate oleh SiKecilPintar — {printDate}
