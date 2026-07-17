@@ -146,14 +146,12 @@ const STUDENT_LIST = [
   { name: 'Muhammad Syauqi Ali', school: 'TK DM59' },
 ];
 
-
-const TABS = ['riwayat', 'input'];
-
 function ScoreRecap() {
   const [activeTab, setActiveTab] = useState('riwayat');
   const [scores, setScores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('semua');
+  const [filterAspect, setFilterAspect] = useState('semua');
   const [filterSchool, setFilterSchool] = useState('semua');
   const [searchTerm, setSearchTerm] = useState('');
   const [isPrinting, setIsPrinting] = useState(false);
@@ -164,6 +162,7 @@ function ScoreRecap() {
     student_name: '',
     school_name: '',
     test_type: 'pretest',
+    aspect: 'ekoliterasi',
     test_date: DEFAULT_PRETEST_DATE,
     score: '',
   });
@@ -173,8 +172,6 @@ function ScoreRecap() {
   useEffect(() => {
     fetchScores();
   }, []);
-
-
 
   // ─── Fetch dari Supabase ───────────────────────────────────────────────────
   async function fetchScores() {
@@ -199,13 +196,13 @@ function ScoreRecap() {
 
   // ─── Filter data riwayat ───────────────────────────────────────────────────
   const filteredScores = scores.filter((s) => {
-    const matchType = filterType === 'semua' || s.test_type === filterType;
-    const matchSchool =
-      filterSchool === 'semua' || s.school_name === filterSchool;
+    const matchType   = filterType   === 'semua' || s.test_type === filterType;
+    const matchAspect = filterAspect === 'semua' || s.aspect    === filterAspect;
+    const matchSchool = filterSchool === 'semua' || s.school_name === filterSchool;
     const matchSearch =
       s.student_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.school_name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchType && matchSchool && matchSearch;
+    return matchType && matchAspect && matchSchool && matchSearch;
   });
 
   // ─── Submit Input Manual ───────────────────────────────────────────────────
@@ -221,7 +218,7 @@ function ScoreRecap() {
       const { error } = await supabase.from('score_recap').insert([
         {
           ...form,
-          score: parseInt(form.score),
+          score: parseFloat(form.score),
         },
       ]);
       if (error) throw error;
@@ -230,6 +227,7 @@ function ScoreRecap() {
         student_name: '',
         school_name: form.school_name,
         test_type: form.test_type,
+        aspect: form.aspect,
         test_date: form.test_date,
         score: '',
       });
@@ -240,8 +238,6 @@ function ScoreRecap() {
       setFormLoading(false);
     }
   }
-
-
 
   // ─── Print PDF ─────────────────────────────────────────────────────────────
   function handlePrint() {
@@ -268,12 +264,20 @@ function ScoreRecap() {
     if (!error) fetchScores();
   }
 
+  // ─── Label aspek ──────────────────────────────────────────────────────────
+  function aspectLabel(aspect) {
+    if (aspect === 'ekoliterasi') return 'Ekoliterasi';
+    if (aspect === 'food_literacy') return 'Food Literacy';
+    return aspect || '-';
+  }
+
   // ─── Render ────────────────────────────────────────────────────────────────
   if (isPrinting) {
     return (
       <PrintableScoreRecap
         scores={filteredScores}
         filterType={filterType}
+        filterAspect={filterAspect}
         filterSchool={filterSchool}
       />
     );
@@ -284,20 +288,32 @@ function ScoreRecap() {
       <header className="sr-header">
         <div className="sr-header-text">
           <h2>Rekap Nilai Siswa</h2>
-          <p>Kelola nilai pretest & posttest seluruh siswa</p>
+          <p>Kelola nilai pretest &amp; posttest seluruh siswa</p>
         </div>
         <div className="sr-header-stats">
           <div className="sr-stat">
             <span className="sr-stat-num">
-              {scores.filter((s) => s.test_type === 'pretest').length}
+              {scores.filter((s) => s.test_type === 'pretest' && s.aspect === 'ekoliterasi').length}
             </span>
-            <span className="sr-stat-label">Pretest</span>
+            <span className="sr-stat-label">Pre Ekol.</span>
           </div>
           <div className="sr-stat">
             <span className="sr-stat-num">
-              {scores.filter((s) => s.test_type === 'posttest').length}
+              {scores.filter((s) => s.test_type === 'posttest' && s.aspect === 'ekoliterasi').length}
             </span>
-            <span className="sr-stat-label">Posttest</span>
+            <span className="sr-stat-label">Post Ekol.</span>
+          </div>
+          <div className="sr-stat">
+            <span className="sr-stat-num">
+              {scores.filter((s) => s.test_type === 'pretest' && s.aspect === 'food_literacy').length}
+            </span>
+            <span className="sr-stat-label">Pre Food</span>
+          </div>
+          <div className="sr-stat">
+            <span className="sr-stat-num">
+              {scores.filter((s) => s.test_type === 'posttest' && s.aspect === 'food_literacy').length}
+            </span>
+            <span className="sr-stat-label">Post Food</span>
           </div>
         </div>
       </header>
@@ -330,14 +346,25 @@ function ScoreRecap() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <div style={{ width: '160px' }}>
+            <div style={{ width: '150px' }}>
               <CustomSelect
                 value={filterType}
                 onChange={(val) => setFilterType(val)}
                 options={[
                   { value: 'semua', label: 'Semua Tes' },
                   { value: 'pretest', label: 'Pretest' },
-                  { value: 'posttest', label: 'Posttest' }
+                  { value: 'posttest', label: 'Posttest' },
+                ]}
+              />
+            </div>
+            <div style={{ width: '180px' }}>
+              <CustomSelect
+                value={filterAspect}
+                onChange={(val) => setFilterAspect(val)}
+                options={[
+                  { value: 'semua', label: 'Semua Aspek' },
+                  { value: 'ekoliterasi', label: 'Ekoliterasi' },
+                  { value: 'food_literacy', label: 'Food Literacy' },
                 ]}
               />
             </div>
@@ -347,7 +374,7 @@ function ScoreRecap() {
                 onChange={(val) => setFilterSchool(val)}
                 options={schools.map((s) => ({
                   value: s,
-                  label: s === 'semua' ? 'Semua Sekolah' : s
+                  label: s === 'semua' ? 'Semua Sekolah' : s,
                 }))}
               />
             </div>
@@ -378,6 +405,7 @@ function ScoreRecap() {
                     <th>Nama Siswa</th>
                     <th>Sekolah</th>
                     <th>Jenis Tes</th>
+                    <th>Aspek</th>
                     <th>Tanggal</th>
                     <th>Nilai</th>
                   </tr>
@@ -389,10 +417,13 @@ function ScoreRecap() {
                       <td className="sr-td-name">{item.student_name}</td>
                       <td className="sr-td-school">{item.school_name}</td>
                       <td>
-                        <span
-                          className={`sr-badge ${item.test_type}`}
-                        >
+                        <span className={`sr-badge ${item.test_type}`}>
                           {item.test_type === 'pretest' ? 'Pretest' : 'Posttest'}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`sr-badge-aspect ${item.aspect}`}>
+                          {aspectLabel(item.aspect)}
                         </span>
                       </td>
                       <td>{formatDateID(item.test_date)}</td>
@@ -470,7 +501,18 @@ function ScoreRecap() {
                   }
                   options={[
                     { value: 'pretest', label: 'Pretest' },
-                    { value: 'posttest', label: 'Posttest' }
+                    { value: 'posttest', label: 'Posttest' },
+                  ]}
+                />
+              </div>
+              <div className="sr-field">
+                <label>Aspek</label>
+                <CustomSelect
+                  value={form.aspect}
+                  onChange={(val) => setForm({ ...form, aspect: val })}
+                  options={[
+                    { value: 'ekoliterasi', label: 'Ekoliterasi' },
+                    { value: 'food_literacy', label: 'Food Literacy' },
                   ]}
                 />
               </div>
@@ -489,7 +531,8 @@ function ScoreRecap() {
                   type="number"
                   min="0"
                   max="100"
-                  placeholder="Contoh: 35"
+                  step="0.1"
+                  placeholder="Contoh: 37.5"
                   value={form.score}
                   onChange={(e) => setForm({ ...form, score: e.target.value })}
                 />
@@ -508,8 +551,6 @@ function ScoreRecap() {
           </form>
         </div>
       )}
-
-
     </div>
   );
 }

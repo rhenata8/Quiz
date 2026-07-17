@@ -6,26 +6,81 @@ import './PrintableScoreRecap.css';
  * PrintableScoreRecap
  * Komponen yang muncul saat tombol Print PDF diklik.
  * Dioptimalkan untuk tampilan cetak A4.
+ * Mendukung filter aspek: ekoliterasi / food_literacy
  */
-function PrintableScoreRecap({ scores, filterType, filterSchool }) {
+function PrintableScoreRecap({ scores, filterType, filterAspect, filterSchool }) {
   const printDate = new Date().toLocaleDateString('id-ID', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
 
-  // Pisahkan pretest dan posttest
-  const pretestData = scores.filter((s) => s.test_type === 'pretest');
-  const posttestData = scores.filter((s) => s.test_type === 'posttest');
-
-  const showBoth = filterType === 'semua';
-  const showPretest = filterType === 'pretest' || showBoth;
-  const showPosttest = filterType === 'posttest' || showBoth;
+  function aspectLabel(aspect) {
+    if (aspect === 'ekoliterasi') return 'Ekoliterasi';
+    if (aspect === 'food_literacy') return 'Food Literacy';
+    return aspect || '-';
+  }
 
   // Rata-rata nilai
   function avg(data) {
-    if (data.length === 0) return 0;
-    return (data.reduce((a, b) => a + b.score, 0) / data.length).toFixed(1);
+    if (data.length === 0) return '0';
+    return (data.reduce((a, b) => a + Number(b.score), 0) / data.length).toFixed(1);
+  }
+
+  // Pisahkan data berdasarkan test_type
+  const pretestData  = scores.filter((s) => s.test_type === 'pretest');
+  const posttestData = scores.filter((s) => s.test_type === 'posttest');
+
+  const showBoth     = filterType === 'semua';
+  const showPretest  = filterType === 'pretest'  || showBoth;
+  const showPosttest = filterType === 'posttest' || showBoth;
+
+  // Judul aspek untuk header
+  const aspectTitle = filterAspect === 'semua'
+    ? 'Ekoliterasi & Food Literacy'
+    : aspectLabel(filterAspect);
+
+  // Tampilkan kolom Aspek jika filter menampilkan semua aspek
+  const showAspectCol = filterAspect === 'semua';
+
+  function renderTable(data, label, colorClass) {
+    if (data.length === 0) return null;
+    return (
+      <div className="psr-section">
+        <div className={`psr-section-header ${colorClass}`}>
+          <span>📋 DATA {label.toUpperCase()}</span>
+          <span>Tanggal: {formatDateID(data[0]?.test_date)}</span>
+        </div>
+        <table className="psr-table">
+          <thead>
+            <tr>
+              <th className="psr-th-num">No.</th>
+              <th>Nama Siswa</th>
+              <th>Asal Sekolah</th>
+              {showAspectCol && <th>Aspek</th>}
+              <th className="psr-th-score">Nilai</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item, idx) => (
+              <tr key={item.id} className={idx % 2 === 0 ? 'even' : 'odd'}>
+                <td className="psr-td-num">{idx + 1}</td>
+                <td>{item.student_name}</td>
+                <td>{item.school_name}</td>
+                {showAspectCol && <td>{aspectLabel(item.aspect)}</td>}
+                <td className="psr-td-score">{item.score}</td>
+              </tr>
+            ))}
+            <tr className="psr-tr-avg">
+              <td colSpan={showAspectCol ? 4 : 3} style={{ textAlign: 'right', fontWeight: 700 }}>
+                Rata-rata Nilai {label}:
+              </td>
+              <td className="psr-td-score">{avg(data)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    );
   }
 
   return (
@@ -51,8 +106,12 @@ function PrintableScoreRecap({ scores, filterType, filterSchool }) {
             </div>
           )}
           <div className="psr-meta-row">
+            <span>Aspek</span>
+            <span>{aspectTitle}</span>
+          </div>
+          <div className="psr-meta-row">
             <span>Total Data</span>
-            <span>{scores.length} siswa</span>
+            <span>{scores.length} data</span>
           </div>
         </div>
       </div>
@@ -62,7 +121,7 @@ function PrintableScoreRecap({ scores, filterType, filterSchool }) {
         <div className="psr-summary">
           <div className="psr-summary-box pretest">
             <span className="psr-summary-label">PRETEST</span>
-            <span className="psr-summary-count">{pretestData.length} siswa</span>
+            <span className="psr-summary-count">{pretestData.length} data</span>
             <span className="psr-summary-avg">Rata-rata: {avg(pretestData)}</span>
             {pretestData[0] && (
               <span className="psr-summary-date">
@@ -72,7 +131,7 @@ function PrintableScoreRecap({ scores, filterType, filterSchool }) {
           </div>
           <div className="psr-summary-box posttest">
             <span className="psr-summary-label">POSTTEST</span>
-            <span className="psr-summary-count">{posttestData.length} siswa</span>
+            <span className="psr-summary-count">{posttestData.length} data</span>
             <span className="psr-summary-avg">Rata-rata: {avg(posttestData)}</span>
             {posttestData[0] && (
               <span className="psr-summary-date">
@@ -84,40 +143,7 @@ function PrintableScoreRecap({ scores, filterType, filterSchool }) {
       )}
 
       {/* Tabel Pretest */}
-      {showPretest && pretestData.length > 0 && (
-        <div className="psr-section">
-          <div className="psr-section-header pretest">
-            <span>📋 DATA PRETEST</span>
-            <span>Tanggal: {formatDateID(pretestData[0]?.test_date)}</span>
-          </div>
-          <table className="psr-table">
-            <thead>
-              <tr>
-                <th className="psr-th-num">No.</th>
-                <th>Nama Siswa</th>
-                <th>Asal Sekolah</th>
-                <th className="psr-th-score">Nilai</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pretestData.map((item, idx) => (
-                <tr key={item.id} className={idx % 2 === 0 ? 'even' : 'odd'}>
-                  <td className="psr-td-num">{idx + 1}</td>
-                  <td>{item.student_name}</td>
-                  <td>{item.school_name}</td>
-                  <td className="psr-td-score">{item.score}</td>
-                </tr>
-              ))}
-              <tr className="psr-tr-avg">
-                <td colSpan={3} style={{ textAlign: 'right', fontWeight: 700 }}>
-                  Rata-rata Nilai Pretest:
-                </td>
-                <td className="psr-td-score">{avg(pretestData)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      )}
+      {showPretest && renderTable(pretestData, 'Pretest', 'pretest')}
 
       {/* Page break jika dua tabel */}
       {showBoth && pretestData.length > 0 && posttestData.length > 0 && (
@@ -125,40 +151,7 @@ function PrintableScoreRecap({ scores, filterType, filterSchool }) {
       )}
 
       {/* Tabel Posttest */}
-      {showPosttest && posttestData.length > 0 && (
-        <div className="psr-section">
-          <div className="psr-section-header posttest">
-            <span>📋 DATA POSTTEST</span>
-            <span>Tanggal: {formatDateID(posttestData[0]?.test_date)}</span>
-          </div>
-          <table className="psr-table">
-            <thead>
-              <tr>
-                <th className="psr-th-num">No.</th>
-                <th>Nama Siswa</th>
-                <th>Asal Sekolah</th>
-                <th className="psr-th-score">Nilai</th>
-              </tr>
-            </thead>
-            <tbody>
-              {posttestData.map((item, idx) => (
-                <tr key={item.id} className={idx % 2 === 0 ? 'even' : 'odd'}>
-                  <td className="psr-td-num">{idx + 1}</td>
-                  <td>{item.student_name}</td>
-                  <td>{item.school_name}</td>
-                  <td className="psr-td-score">{item.score}</td>
-                </tr>
-              ))}
-              <tr className="psr-tr-avg">
-                <td colSpan={3} style={{ textAlign: 'right', fontWeight: 700 }}>
-                  Rata-rata Nilai Posttest:
-                </td>
-                <td className="psr-td-score">{avg(posttestData)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      )}
+      {showPosttest && renderTable(posttestData, 'Posttest', 'posttest')}
 
       <div className="psr-footer">
         Dokumen ini digenerate oleh SiKecilPintar — {printDate}
